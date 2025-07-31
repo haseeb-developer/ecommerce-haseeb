@@ -1,7 +1,5 @@
 # 🛒 E-Commerce Platform (React JS)
 
-Live Preview: https://ecommerce-haseeb-v1.vercel.app/
-
 
 #Developed and Coded by Haseeb Khan
 
