@@ -30,13 +30,11 @@ const Products = () => {
   const [page, setPage] = useState(1);
   const [cardsPerPage, setCardsPerPage] = useState(() => {
     if (typeof window !== 'undefined') {
-      if (window.innerWidth < 768) return 6; // 3x2 grid for mobile
-      if (window.innerWidth < 1200) return 8; // 4x2 grid for tablet
-      if (window.innerWidth < 1600) return 12; // 4x3 grid for medium desktop
+      if (window.innerWidth < 768) return 2;
+      if (window.innerWidth < 1000) return 6;
     }
-    return 16; // 4x4 grid for large desktop
+    return 9;
   });
-
   const [isMobileOrTablet, setIsMobileOrTablet] = useState(() => {
     if (typeof window !== 'undefined') {
       return window.innerWidth < 1000;
@@ -55,13 +53,11 @@ const Products = () => {
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 768) {
-        setCardsPerPage(6); // 3x2 grid for mobile
-      } else if (window.innerWidth < 1200) {
-        setCardsPerPage(8); // 4x2 grid for tablet
-      } else if (window.innerWidth < 1600) {
-        setCardsPerPage(12); // 4x3 grid for medium desktop
+        setCardsPerPage(2);
+      } else if (window.innerWidth < 1000) {
+        setCardsPerPage(6);
       } else {
-        setCardsPerPage(16); // 4x4 grid for large desktop
+        setCardsPerPage(9);
       }
     };
     window.addEventListener('resize', handleResize);
@@ -224,8 +220,8 @@ const Products = () => {
     }
     return (
       <AnimatePresence mode="wait">
-                 <motion.div
-           key={activeFilter}
+        <motion.div
+          key={page + '-' + activeFilter}
           style={styles.grid}
           className="products-grid"
           initial={{ opacity: 0, y: 30 }}
@@ -234,7 +230,7 @@ const Products = () => {
           transition={{ duration: 0.35, type: "spring", stiffness: 120, damping: 18 }}
           layout
         >
-                     {paginated.map((product) => {
+          {paginated.map((product) => {
             const inStock = product.stock !== undefined
               ? product.stock > 0
               : (product.rating?.count > 0 && product.id % 3 !== 0);
@@ -384,10 +380,10 @@ const Products = () => {
               </button>
             ))}
           </div>
-                 </div>
-         {loading ? <Loading /> : <ShowProducts />}
-         {!loading && window.innerWidth >= 768 && <Pagination />}
-       </div>
+        </div>
+        {loading ? <Loading /> : <ShowProducts />}
+        {!loading && window.innerWidth >= 768 && <Pagination />}
+      </div>
     </>
   );
 };
@@ -455,13 +451,13 @@ const styles = {
     border: "1.5px solid #0ea5e9",
     boxShadow: "0 2px 8px rgba(14,165,233,0.08)",
   },
-     grid: {
-     display: "grid",
-     gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-     gap: "1.2rem 1rem",
-     alignItems: "stretch",
-     width: "100%",
-   },
+  grid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))",
+    gap: "1.2rem 1rem",
+    alignItems: "stretch",
+    width: "100%",
+  },
   '@media (max-width: 768px)': {
     grid: {
       gridTemplateColumns: '1fr',
@@ -473,89 +469,89 @@ const styles = {
       maxWidth: '100%',
     },
   },
-     cardWrapper: {
-     display: "flex",
-     justifyContent: "center",
-     alignItems: "stretch",
-     minWidth: 0,
-     width: '100%',
-     maxWidth: '100%',
-   },
-   paginationBar: {
-     display: 'flex',
-     justifyContent: 'center',
-     alignItems: 'center',
-     gap: 8,
-     margin: '2.5rem 0 3.5rem 0', 
-     fontFamily: "'Poppins', sans-serif",
-   },
-   pageBtn: {
-     border: '1.5px solid #e0e7ef',
-     background: '#fff',
-     color: '#2563eb',
-     borderRadius: '0.6rem',
-     padding: '0.5rem 1.1rem',
-     fontWeight: 500,
-     fontSize: '1.08rem',
-     cursor: 'pointer',
-     transition: 'all 0.2s',
-     outline: 'none',
-     minWidth: 40,
-   },
-   pageBtnActive: {
-     background: '#2563eb',
-     color: '#fff',
-     border: '1.5px solid #2563eb',
-     boxShadow: '0 2px 8px rgba(37,99,235,0.08)',
-     fontWeight: 600,
-     fontSize: '1.08rem',
-     borderRadius: '0.6rem',
-     padding: '0.5rem 1.1rem',
-     minWidth: 40,
-     cursor: 'pointer',
-     outline: 'none',
-     transition: 'all 0.2s',
-   },
-   pageNavBtn: {
-     border: '1.5px solid #e0e7ef',
-     background: '#fff',
-     color: '#2563eb',
-     borderRadius: '0.6rem',
-     padding: '0.5rem 0.7rem',
-     fontWeight: 500,
-     fontSize: '1.08rem',
-     cursor: 'pointer',
-     transition: 'all 0.2s',
-     outline: 'none',
-     minWidth: 40,
-     display: 'flex',
-     alignItems: 'center',
-     justifyContent: 'center',
-   },
-   pageNavBtnDisabled: {
-     border: '1.5px solid #e0e7ef',
-     background: '#f1f5f9',
-     color: '#b6c3d1',
-     borderRadius: '0.6rem',
-     padding: '0.5rem 0.7rem',
-     fontWeight: 500,
-     fontSize: '1.08rem',
-     cursor: 'not-allowed',
-     outline: 'none',
-     minWidth: 40,
-     display: 'flex',
-     alignItems: 'center',
-     justifyContent: 'center',
-     opacity: 0.7,
-   },
-   ellipsis: {
-     color: '#b6c3d1',
-     fontSize: '1.3rem',
-     fontWeight: 600,
-     margin: '0 2px',
-     userSelect: 'none',
-   },
- };
+  cardWrapper: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "stretch",
+    minWidth: 0,
+    width: '100%',
+    maxWidth: '100%',
+  },
+  paginationBar: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+    margin: '2.5rem 0 3.5rem 0', 
+    fontFamily: "'Poppins', sans-serif",
+  },
+  pageBtn: {
+    border: '1.5px solid #e0e7ef',
+    background: '#fff',
+    color: '#2563eb',
+    borderRadius: '0.6rem',
+    padding: '0.5rem 1.1rem',
+    fontWeight: 500,
+    fontSize: '1.08rem',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+    outline: 'none',
+    minWidth: 40,
+  },
+  pageBtnActive: {
+    background: '#2563eb',
+    color: '#fff',
+    border: '1.5px solid #2563eb',
+    boxShadow: '0 2px 8px rgba(37,99,235,0.08)',
+    fontWeight: 600,
+    fontSize: '1.08rem',
+    borderRadius: '0.6rem',
+    padding: '0.5rem 1.1rem',
+    minWidth: 40,
+    cursor: 'pointer',
+    outline: 'none',
+    transition: 'all 0.2s',
+  },
+  pageNavBtn: {
+    border: '1.5px solid #e0e7ef',
+    background: '#fff',
+    color: '#2563eb',
+    borderRadius: '0.6rem',
+    padding: '0.5rem 0.7rem',
+    fontWeight: 500,
+    fontSize: '1.08rem',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+    outline: 'none',
+    minWidth: 40,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  pageNavBtnDisabled: {
+    border: '1.5px solid #e0e7ef',
+    background: '#f1f5f9',
+    color: '#b6c3d1',
+    borderRadius: '0.6rem',
+    padding: '0.5rem 0.7rem',
+    fontWeight: 500,
+    fontSize: '1.08rem',
+    cursor: 'not-allowed',
+    outline: 'none',
+    minWidth: 40,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    opacity: 0.7,
+  },
+  ellipsis: {
+    color: '#b6c3d1',
+    fontSize: '1.3rem',
+    fontWeight: 600,
+    margin: '0 2px',
+    userSelect: 'none',
+  },
+};
 
 const LeftArrowSVG = (
   <svg width="22" height="22" fill="none" viewBox="0 0 22 22">
@@ -571,8 +567,8 @@ const RightArrowSVG = (
 const mobileStyle = `
   @media (max-width: 768px) {
     .products-grid {
-      grid-template-columns: repeat(3, 1fr) !important;
-      gap: 1rem !important;
+      grid-template-columns: 1fr !important;
+      gap: 1rem 0 !important;
     }
     .product-card-wrapper {
       width: 100% !important;
@@ -581,21 +577,6 @@ const mobileStyle = `
       margin: 0 !important;
       padding: 0 !important;
       display: flex !important;
-    }
-  }
-  @media (min-width: 769px) and (max-width: 1200px) {
-    .products-grid {
-      grid-template-columns: repeat(4, 1fr) !important;
-    }
-  }
-  @media (min-width: 1201px) and (max-width: 1600px) {
-    .products-grid {
-      grid-template-columns: repeat(4, 1fr) !important;
-    }
-  }
-  @media (min-width: 1601px) {
-    .products-grid {
-      grid-template-columns: repeat(4, 1fr) !important;
     }
   }
 `;
