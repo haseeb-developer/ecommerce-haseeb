@@ -9,10 +9,15 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/effect-fade';
 
+// Import banner images - using require for public assets
+const image1 = process.env.PUBLIC_URL + '/assets/image1.jpg';
+const image2 = process.env.PUBLIC_URL + '/assets/image2.jpg';
+const image3 = process.env.PUBLIC_URL + '/assets/image3.jpg';
+
 const heroSlides = [
   {
     id: 1,
-    image: '/assets/image1.jpg',
+    image: image1,
     title: 'NEW SEASON ARRIVALS',
     subtitle: 'Discover the Latest Trends',
     description: 'Explore our curated collection of premium fashion items that define style and elegance.',
@@ -23,7 +28,7 @@ const heroSlides = [
   },
   {
     id: 2,
-    image: '/assets/image2.jpg',
+    image: image2,
     title: 'PREMIUM COLLECTION',
     subtitle: 'Luxury Meets Comfort',
     description: 'Experience unparalleled quality with our handpicked selection of premium clothing.',
@@ -34,7 +39,7 @@ const heroSlides = [
   },
   {
     id: 3,
-    image: '/assets/image3.jpg',
+    image: image3,
     title: 'SUMMER ESSENTIALS',
     subtitle: 'Stay Cool & Stylish',
     description: 'Beat the heat with our summer collection featuring breathable fabrics and trendy designs.',
