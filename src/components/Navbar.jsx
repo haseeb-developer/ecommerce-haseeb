@@ -3,7 +3,6 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
-    FaHome, 
     FaShoppingBag, 
     FaInfoCircle, 
     FaPhone, 
@@ -33,7 +32,6 @@ const Navbar = () => {
     const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
     const navItems = [
-        { path: '/', label: 'Home', icon: FaHome },
         { path: '/product', label: 'Products', icon: FaShoppingBag },
         { path: '/about', label: 'About', icon: FaInfoCircle },
         { path: '/contact', label: 'Contact', icon: FaPhone }

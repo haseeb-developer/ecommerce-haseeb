@@ -12,7 +12,7 @@ import 'swiper/css/effect-fade';
 const heroSlides = [
   {
     id: 1,
-    image: '/assets/main.jpg',
+    image: '/assets/image1.jpg',
     title: 'NEW SEASON ARRIVALS',
     subtitle: 'Discover the Latest Trends',
     description: 'Explore our curated collection of premium fashion items that define style and elegance.',
@@ -23,7 +23,7 @@ const heroSlides = [
   },
   {
     id: 2,
-    image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
+    image: '/assets/image2.jpg',
     title: 'PREMIUM COLLECTION',
     subtitle: 'Luxury Meets Comfort',
     description: 'Experience unparalleled quality with our handpicked selection of premium clothing.',
@@ -34,7 +34,7 @@ const heroSlides = [
   },
   {
     id: 3,
-    image: 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
+    image: '/assets/image3.jpg',
     title: 'SUMMER ESSENTIALS',
     subtitle: 'Stay Cool & Stylish',
     description: 'Beat the heat with our summer collection featuring breathable fabrics and trendy designs.',
@@ -89,7 +89,31 @@ const Home = () => {
           left: 0;
           right: 0;
           bottom: 0;
-          background: linear-gradient(135deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.6) 100%);
+          background: 
+            linear-gradient(135deg, 
+              rgba(0,0,0,0.7) 0%, 
+              rgba(0,0,0,0.5) 25%, 
+              rgba(0,0,0,0.3) 50%, 
+              rgba(0,0,0,0.6) 75%, 
+              rgba(0,0,0,0.8) 100%
+            ),
+            linear-gradient(
+              to bottom,
+              rgba(0,0,0,0.4) 0%,
+              rgba(0,0,0,0.2) 40%,
+              rgba(0,0,0,0.4) 80%,
+              rgba(0,0,0,0.6) 100%
+            ),
+            radial-gradient(
+              circle at 20% 80%, 
+              rgba(0,0,0,0.3) 0%, 
+              transparent 60%
+            ),
+            radial-gradient(
+              circle at 80% 20%, 
+              rgba(0,0,0,0.4) 0%, 
+              transparent 60%
+            );
           z-index: 1;
         }
         
@@ -104,16 +128,23 @@ const Home = () => {
         
         .hero-badge {
           display: inline-block;
-          padding: 0.5rem 1.5rem;
+          padding: 0.75rem 2rem;
           background: rgba(255,255,255,0.2);
-          backdrop-filter: blur(10px);
+          backdrop-filter: blur(20px);
           border: 1px solid rgba(255,255,255,0.3);
           border-radius: 50px;
-          font-size: 0.8rem;
-          font-weight: 600;
-          letter-spacing: 2px;
+          font-size: 0.85rem;
+          font-weight: 700;
+          letter-spacing: 3px;
           margin-bottom: 1.5rem;
           animation: pulse 2s infinite;
+          box-shadow: 
+            0 6px 20px rgba(0,0,0,0.4),
+            inset 0 1px 0 rgba(255,255,255,0.4),
+            0 0 20px rgba(255,255,255,0.1);
+          text-shadow: 
+            0 2px 4px rgba(0,0,0,0.5),
+            0 0 10px rgba(255,255,255,0.2);
         }
         
         .hero-title {
@@ -121,29 +152,41 @@ const Home = () => {
           font-weight: 700;
           margin-bottom: 1rem;
           line-height: 1.1;
-          text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-          background: linear-gradient(45deg, #fff, #f0f0f0);
+          text-shadow: 
+            3px 3px 6px rgba(0,0,0,0.8),
+            0 0 30px rgba(255,255,255,0.2),
+            0 0 60px rgba(255,255,255,0.1);
+          background: linear-gradient(45deg, #ffffff, #f1f5f9, #e2e8f0);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
+          filter: drop-shadow(0 3px 6px rgba(0,0,0,0.5));
         }
         
         .hero-subtitle {
           font-size: ${isMobile ? '1.2rem' : '1.8rem'};
           font-weight: 300;
           margin-bottom: 1.5rem;
-          opacity: 0.9;
-          text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+          opacity: 1;
+          text-shadow: 
+            2px 2px 4px rgba(0,0,0,0.8),
+            0 0 20px rgba(255,255,255,0.15),
+            0 0 40px rgba(255,255,255,0.1);
+          filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
         }
         
         .hero-description {
           font-size: ${isMobile ? '1rem' : '1.2rem'};
           margin-bottom: 2.5rem;
-          opacity: 0.8;
+          opacity: 0.95;
           line-height: 1.6;
           max-width: 600px;
           margin-left: auto;
           margin-right: auto;
+          text-shadow: 
+            2px 2px 4px rgba(0,0,0,0.8),
+            0 0 15px rgba(255,255,255,0.1),
+            0 0 30px rgba(255,255,255,0.05);
         }
         
         .hero-cta {
