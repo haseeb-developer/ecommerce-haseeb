@@ -13,7 +13,9 @@ import {
     FaFacebook, 
     FaTwitter,
     FaShieldAlt,
-    FaCheckCircle
+    FaCheckCircle,
+    FaRobot,
+    FaTimes
 } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { registerUser } from '../redux/action';
@@ -35,6 +37,15 @@ const Register = () => {
     const [errors, setErrors] = useState({});
     const [focusedField, setFocusedField] = useState(null);
     const [passwordStrength, setPasswordStrength] = useState(0);
+    const [passwordRequirements, setPasswordRequirements] = useState({
+        length: false,
+        uppercase: false,
+        lowercase: false,
+        number: false,
+        special: false
+    });
+    const [suggestedPassword, setSuggestedPassword] = useState('');
+    const [showSuggestedPassword, setShowSuggestedPassword] = useState(false);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -51,15 +62,24 @@ const Register = () => {
             }));
         }
 
-        // Calculate password strength
+        // Calculate password strength and requirements
         if (name === 'password') {
             let strength = 0;
-            if (value.length >= 8) strength += 1;
-            if (/[a-z]/.test(value)) strength += 1;
-            if (/[A-Z]/.test(value)) strength += 1;
-            if (/[0-9]/.test(value)) strength += 1;
-            if (/[^A-Za-z0-9]/.test(value)) strength += 1;
+            const requirements = {
+                length: value.length >= 8,
+                uppercase: /[A-Z]/.test(value),
+                lowercase: /[a-z]/.test(value),
+                number: /[0-9]/.test(value),
+                special: /[^A-Za-z0-9]/.test(value)
+            };
+            
+            // Calculate strength based on requirements
+            Object.values(requirements).forEach(met => {
+                if (met) strength += 1;
+            });
+            
             setPasswordStrength(strength);
+            setPasswordRequirements(requirements);
         }
     };
 
@@ -138,6 +158,73 @@ const Register = () => {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const generateSuggestedPassword = () => {
+        const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+        const numbers = '0123456789';
+        const symbols = '!@#$%^&*()_+-=[]{}|;:,.<>?';
+        
+        let password = '';
+        
+        // Ensure at least one character from each category
+        password += uppercase[Math.floor(Math.random() * uppercase.length)];
+        password += lowercase[Math.floor(Math.random() * lowercase.length)];
+        password += numbers[Math.floor(Math.random() * numbers.length)];
+        password += symbols[Math.floor(Math.random() * symbols.length)];
+        
+        // Fill the rest with random characters (total length 12)
+        const allChars = uppercase + lowercase + numbers + symbols;
+        for (let i = 4; i < 12; i++) {
+            password += allChars[Math.floor(Math.random() * allChars.length)];
+        }
+        
+        // Shuffle the password to make it more random
+        password = password.split('').sort(() => Math.random() - 0.5).join('');
+        
+        setSuggestedPassword(password);
+        setShowSuggestedPassword(true);
+    };
+
+    const useSuggestedPassword = () => {
+        setFormData(prev => ({
+            ...prev,
+            password: suggestedPassword,
+            confirmPassword: suggestedPassword
+        }));
+        setShowSuggestedPassword(false);
+        
+        // Trigger password validation
+        const event = {
+            target: {
+                name: 'password',
+                value: suggestedPassword
+            }
+        };
+        handleInputChange(event);
+    };
+
+    const clearPassword = () => {
+        setFormData(prev => ({
+            ...prev,
+            password: ''
+        }));
+        setPasswordStrength(0);
+        setPasswordRequirements({
+            length: false,
+            uppercase: false,
+            lowercase: false,
+            number: false,
+            special: false
+        });
+    };
+
+    const clearConfirmPassword = () => {
+        setFormData(prev => ({
+            ...prev,
+            confirmPassword: ''
+        }));
     };
 
     const handleSocialRegister = (provider) => {
@@ -229,7 +316,6 @@ const Register = () => {
                                         className="form-input"
                                         required
                                     />
-                                    <div className="input-line"></div>
                                 </div>
                                 <AnimatePresence>
                                     {errors.fullName && (
@@ -264,7 +350,6 @@ const Register = () => {
                                         className="form-input"
                                         required
                                     />
-                                    <div className="input-line"></div>
                                 </div>
                                 <AnimatePresence>
                                     {errors.email && (
@@ -299,6 +384,15 @@ const Register = () => {
                                         className="form-input"
                                         required
                                     />
+                                    {formData.password && (
+                                        <button
+                                            type="button"
+                                            className="password-clear"
+                                            onClick={clearPassword}
+                                        >
+                                            <FaTimes />
+                                        </button>
+                                    )}
                                     <button
                                         type="button"
                                         className="password-toggle"
@@ -306,15 +400,101 @@ const Register = () => {
                                     >
                                         {showPassword ? <FaEyeSlash /> : <FaEye />}
                                     </button>
-                                    <div className="input-line"></div>
                                 </div>
                                 
                                 {formData.password && (
                                     <motion.div 
-                                        className="password-strength"
+                                        className="password-requirements"
                                         initial={{ opacity: 0, height: 0 }}
                                         animate={{ opacity: 1, height: 'auto' }}
+                                        transition={{ duration: 0.3 }}
                                     >
+                                        <div className="requirements-title">
+                                            Password Requirements:
+                                        </div>
+                                        <div className="requirements-list">
+                                            <motion.div 
+                                                className={`requirement-item ${passwordRequirements.length ? 'met' : ''}`}
+                                                initial={{ opacity: 0, x: -10 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                transition={{ delay: 0.1 }}
+                                            >
+                                                <div className="requirement-icon">
+                                                    {passwordRequirements.length ? (
+                                                        <FaCheckCircle className="check-icon" />
+                                                    ) : (
+                                                        <div className="cross-icon">×</div>
+                                                    )}
+                                                </div>
+                                                <span>At least 8 characters</span>
+                                            </motion.div>
+                                            
+                                            <motion.div 
+                                                className={`requirement-item ${passwordRequirements.uppercase ? 'met' : ''}`}
+                                                initial={{ opacity: 0, x: -10 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                transition={{ delay: 0.2 }}
+                                            >
+                                                <div className="requirement-icon">
+                                                    {passwordRequirements.uppercase ? (
+                                                        <FaCheckCircle className="check-icon" />
+                                                    ) : (
+                                                        <div className="cross-icon">×</div>
+                                                    )}
+                                                </div>
+                                                <span>One uppercase letter (A-Z)</span>
+                                            </motion.div>
+                                            
+                                            <motion.div 
+                                                className={`requirement-item ${passwordRequirements.lowercase ? 'met' : ''}`}
+                                                initial={{ opacity: 0, x: -10 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                transition={{ delay: 0.3 }}
+                                            >
+                                                <div className="requirement-icon">
+                                                    {passwordRequirements.lowercase ? (
+                                                        <FaCheckCircle className="check-icon" />
+                                                    ) : (
+                                                        <div className="cross-icon">×</div>
+                                                    )}
+                                                </div>
+                                                <span>One lowercase letter (a-z)</span>
+                                            </motion.div>
+                                            
+                                            <motion.div 
+                                                className={`requirement-item ${passwordRequirements.number ? 'met' : ''}`}
+                                                initial={{ opacity: 0, x: -10 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                transition={{ delay: 0.4 }}
+                                            >
+                                                <div className="requirement-icon">
+                                                    {passwordRequirements.number ? (
+                                                        <FaCheckCircle className="check-icon" />
+                                                    ) : (
+                                                        <div className="cross-icon">×</div>
+                                                    )}
+                                                </div>
+                                                <span>One number (0-9)</span>
+                                            </motion.div>
+                                            
+                                            <motion.div 
+                                                className={`requirement-item ${passwordRequirements.special ? 'met' : ''}`}
+                                                initial={{ opacity: 0, x: -10 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                transition={{ delay: 0.5 }}
+                                            >
+                                                <div className="requirement-icon">
+                                                    {passwordRequirements.special ? (
+                                                        <FaCheckCircle className="check-icon" />
+                                                    ) : (
+                                                        <div className="cross-icon">×</div>
+                                                    )}
+                                                </div>
+                                                <span>One special character (!@#$%^&*)</span>
+                                            </motion.div>
+                                        </div>
+                                        
+                                        <div className="strength-summary">
                                         <div className="strength-bar">
                                             <div 
                                                 className="strength-fill"
@@ -330,6 +510,7 @@ const Register = () => {
                                         >
                                             {getPasswordStrengthText()}
                                         </span>
+                                        </div>
                                     </motion.div>
                                 )}
                                 
@@ -345,6 +526,59 @@ const Register = () => {
                                         </motion.span>
                                     )}
                                 </AnimatePresence>
+
+                                <motion.div 
+                                    className="ai-password-suggestion"
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.1, duration: 0.3 }}
+                                >
+                                    <motion.button
+                                        type="button"
+                                        className="suggest-password-btn"
+                                        onClick={generateSuggestedPassword}
+                                        whileHover={{ scale: 1.02 }}
+                                        whileTap={{ scale: 0.98 }}
+                                    >
+                                        <FaRobot />
+                                        <span>AI Suggest Password</span>
+                                    </motion.button>
+                                    
+                                    <AnimatePresence>
+                                        {showSuggestedPassword && (
+                                            <motion.div 
+                                                className="suggested-password-container"
+                                                initial={{ opacity: 0, height: 0 }}
+                                                animate={{ opacity: 1, height: 'auto' }}
+                                                exit={{ opacity: 0, height: 0 }}
+                                                transition={{ duration: 0.3 }}
+                                            >
+                                                <div className="suggested-password-header">
+                                                    <FaRobot className="ai-icon" />
+                                                    <span>AI Suggested Password:</span>
+                                                </div>
+                                                <div className="suggested-password-display">
+                                                    <span className="password-text">{suggestedPassword}</span>
+                                                    <motion.button
+                                                        type="button"
+                                                        className="use-password-btn"
+                                                        onClick={useSuggestedPassword}
+                                                        whileHover={{ scale: 1.05 }}
+                                                        whileTap={{ scale: 0.95 }}
+                                                    >
+                                                        Use This Password
+                                                    </motion.button>
+                                                </div>
+                                                                                                 <div className="password-security-info">
+                                                     <span><FaCheckCircle className="security-check" /> 12 characters long</span>
+                                                     <span><FaCheckCircle className="security-check" /> Contains uppercase & lowercase</span>
+                                                     <span><FaCheckCircle className="security-check" /> Includes numbers & symbols</span>
+                                                     <span><FaCheckCircle className="security-check" /> Cryptographically secure</span>
+                                                 </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </motion.div>
                             </motion.div>
 
                             <motion.div 
@@ -366,6 +600,15 @@ const Register = () => {
                                         className="form-input"
                                         required
                                     />
+                                    {formData.confirmPassword && (
+                                        <button
+                                            type="button"
+                                            className="password-clear"
+                                            onClick={clearConfirmPassword}
+                                        >
+                                            <FaTimes />
+                                        </button>
+                                    )}
                                     <button
                                         type="button"
                                         className="password-toggle"
@@ -373,7 +616,6 @@ const Register = () => {
                                     >
                                         {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
                                     </button>
-                                    <div className="input-line"></div>
                                 </div>
                                 <AnimatePresence>
                                     {errors.confirmPassword && (
@@ -440,36 +682,39 @@ const Register = () => {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 1.3, duration: 0.6 }}
                             >
-                                <button
-                                    type="button"
-                                    className="social-button google"
-                                    onClick={() => handleSocialRegister('Google')}
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                >
-                                    <FaGoogle />
-                                    Google
-                                </button>
-                                <button
-                                    type="button"
-                                    className="social-button facebook"
-                                    onClick={() => handleSocialRegister('Facebook')}
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                >
-                                    <FaFacebook />
-                                    Facebook
-                                </button>
-                                <button
-                                    type="button"
-                                    className="social-button twitter"
-                                    onClick={() => handleSocialRegister('Twitter')}
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                >
-                                    <FaTwitter />
-                                    Twitter
-                                </button>
+                                <div className="coming-soon-text">This feature will be add in next update</div>
+                                <div className="social-buttons-container">
+                                    <button
+                                        type="button"
+                                        className="social-button google"
+                                        onClick={() => handleSocialRegister('Google')}
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                    >
+                                        <FaGoogle />
+                                        Google
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="social-button facebook"
+                                        onClick={() => handleSocialRegister('Facebook')}
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                    >
+                                        <FaFacebook />
+                                        Facebook
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="social-button twitter"
+                                        onClick={() => handleSocialRegister('Twitter')}
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                    >
+                                        <FaTwitter />
+                                        Twitter
+                                    </button>
+                                </div>
                             </motion.div>
 
                             <motion.div 
@@ -636,7 +881,6 @@ const Register = () => {
                     .register-form {
                         display: flex;
                         flex-direction: column;
-                        gap: 1.5rem;
                     }
 
                     .form-group {
@@ -647,15 +891,20 @@ const Register = () => {
                         position: relative;
                         display: flex;
                         align-items: center;
+                        margin-bottom: 0.5rem;
                     }
 
                     .input-icon {
                         position: absolute;
                         left: 1rem;
-                        color: #a0aec0;
-                        font-size: 1.1rem;
+                        color: #667eea;
+                        font-size: 1rem;
                         transition: all 0.3s ease;
                         z-index: 2;
+                        background: rgba(102, 126, 234, 0.1);
+                        padding: 0.5rem;
+                        border-radius: 8px;
+                        border: 1px solid rgba(102, 126, 234, 0.2);
                     }
 
                     .form-input {
@@ -664,61 +913,161 @@ const Register = () => {
                         border: 2px solid #e2e8f0;
                         border-radius: 12px;
                         font-size: 1rem;
-                        background: rgba(255, 255, 255, 0.8);
+                        background: rgba(255, 255, 255, 0.9);
                         transition: all 0.3s ease;
                         outline: none;
+                        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                    }
+
+                    .form-input:hover {
+                        border-color: #cbd5e0;
+                        background: white;
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                        transform: translateY(-1px);
                     }
 
                     .form-input:focus {
                         border-color: #667eea;
                         background: white;
-                        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+                        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1), 0 4px 12px rgba(0, 0, 0, 0.1);
+                        transform: translateY(-1px);
                     }
 
                     .form-group.focused .input-icon {
                         color: #667eea;
+                        background: rgba(102, 126, 234, 0.15);
+                        border-color: rgba(102, 126, 234, 0.3);
+                        transform: scale(1.05);
+                        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
                     }
 
                     .form-group.error .form-input {
                         border-color: #e53e3e;
-                        box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1);
+                        box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1), 0 4px 12px rgba(0, 0, 0, 0.1);
+                        transform: translateY(-1px);
+                    }
+
+                    .form-group.error .form-input:hover {
+                        border-color: #e53e3e;
+                        box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1), 0 6px 16px rgba(0, 0, 0, 0.15);
+                        transform: translateY(-2px);
                     }
 
                     .password-toggle {
                         position: absolute;
                         right: 1rem;
-                        background: none;
-                        border: none;
-                        color: #a0aec0;
+                        background: rgba(102, 126, 234, 0.1);
+                        border: 1px solid rgba(102, 126, 234, 0.2);
+                        color: #667eea;
                         cursor: pointer;
-                        font-size: 1.1rem;
-                        transition: color 0.3s ease;
+                        font-size: 1rem;
+                        transition: all 0.3s ease;
                         z-index: 2;
+                        padding: 0.5rem;
+                        border-radius: 8px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
                     }
 
                     .password-toggle:hover {
                         color: #667eea;
+                        background: rgba(102, 126, 234, 0.15);
+                        border-color: rgba(102, 126, 234, 0.3);
+                        transform: scale(1.05);
+                        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
                     }
 
-                    .input-line {
+                    .password-clear {
                         position: absolute;
-                        bottom: 0;
-                        left: 0;
-                        width: 0;
-                        height: 2px;
-                        background: linear-gradient(90deg, #667eea, #764ba2);
-                        transition: width 0.3s ease;
+                        right: 3.5rem;
+                        background: rgba(229, 62, 62, 0.1);
+                        border: 1px solid rgba(229, 62, 62, 0.2);
+                        color: #e53e3e;
+                        cursor: pointer;
+                        font-size: 0.9rem;
+                        transition: all 0.3s ease;
+                        z-index: 2;
+                        padding: 0.5rem;
+                        border-radius: 8px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
                     }
 
-                    .form-group.focused .input-line {
-                        width: 100%;
+                    .password-clear:hover {
+                        color: #e53e3e;
+                        background: rgba(229, 62, 62, 0.15);
+                        border-color: rgba(229, 62, 62, 0.3);
+                        transform: scale(1.05);
+                        box-shadow: 0 2px 8px rgba(229, 62, 62, 0.2);
                     }
 
-                    .password-strength {
-                        margin-top: 0.5rem;
+
+
+                    .password-requirements {
+                        margin-top: 1rem;
+                        padding: 1rem;
+                        background: rgba(255, 255, 255, 0.8);
+                        border-radius: 12px;
+                        border: 1px solid #e2e8f0;
+                    }
+
+                    .requirements-title {
+                        font-size: 0.9rem;
+                        font-weight: 600;
+                        color: #4a5568;
+                        margin-bottom: 0.75rem;
+                    }
+
+                    .requirements-list {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.5rem;
+                        margin-bottom: 1rem;
+                    }
+
+                    .requirement-item {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        font-size: 0.8rem;
+                        color: #718096;
+                        transition: all 0.3s ease;
+                    }
+
+                    .requirement-item.met {
+                        color: #38a169;
+                    }
+
+                    .requirement-icon {
+                        width: 16px;
+                        height: 16px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        border-radius: 50%;
+                        transition: all 0.3s ease;
+                    }
+
+                    .cross-icon {
+                        color: #e53e3e;
+                        font-size: 1.2rem;
+                        font-weight: bold;
+                        line-height: 1;
+                    }
+
+                    .check-icon {
+                        color: #38a169;
+                        font-size: 0.9rem;
+                    }
+
+                    .strength-summary {
                         display: flex;
                         align-items: center;
                         gap: 1rem;
+                        padding-top: 0.75rem;
+                        border-top: 1px solid #e2e8f0;
                     }
 
                     .strength-bar {
@@ -738,6 +1087,119 @@ const Register = () => {
                         font-size: 0.8rem;
                         font-weight: 600;
                         min-width: 60px;
+                    }
+
+                    .ai-password-suggestion {
+                        margin-top: 1rem;
+                    }
+
+                    .suggest-password-btn {
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        color: white;
+                        border: none;
+                        padding: 0.75rem 1.5rem;
+                        border-radius: 8px;
+                        font-size: 0.9rem;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        width: 100%;
+                        justify-content: center;
+                    }
+
+                    .suggest-password-btn:hover {
+                        transform: translateY(-1px);
+                        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+                    }
+
+                    .suggested-password-container {
+                        margin-top: 1rem;
+                        padding: 1rem;
+                        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+                        border: 1px solid rgba(102, 126, 234, 0.2);
+                        border-radius: 12px;
+                        backdrop-filter: blur(10px);
+                    }
+
+                    .suggested-password-header {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        margin-bottom: 1rem;
+                        font-weight: 600;
+                        color: #4a5568;
+                        font-size: 0.9rem;
+                    }
+
+                    .ai-icon {
+                        color: #667eea;
+                        font-size: 1rem;
+                    }
+
+                    .suggested-password-display {
+                        display: flex;
+                        align-items: center;
+                        gap: 1rem;
+                        margin-bottom: 1rem;
+                        padding: 0.75rem;
+                        background: rgba(255, 255, 255, 0.8);
+                        border-radius: 8px;
+                        border: 1px solid #e2e8f0;
+                    }
+
+                    .password-text {
+                        font-family: 'Courier New', monospace;
+                        font-size: 1rem;
+                        font-weight: 600;
+                        color: #2d3748;
+                        letter-spacing: 1px;
+                        background: #f7fafc;
+                        padding: 0.5rem 0.75rem;
+                        border-radius: 4px;
+                        border: 1px solid #e2e8f0;
+                        flex: 1;
+                    }
+
+                    .use-password-btn {
+                        background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+                        color: white;
+                        border: none;
+                        padding: 0.5rem 1rem;
+                        border-radius: 6px;
+                        font-size: 0.8rem;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        white-space: nowrap;
+                    }
+
+                    .use-password-btn:hover {
+                        transform: translateY(-1px);
+                        box-shadow: 0 3px 10px rgba(56, 161, 105, 0.3);
+                    }
+
+                    .password-security-info {
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        gap: 0.5rem;
+                        font-size: 0.75rem;
+                        color: #38a169;
+                        font-weight: 500;
+                    }
+
+                    .password-security-info span {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                    }
+
+                    .security-check {
+                        color: #38a169;
+                        font-size: 0.8rem;
+                        flex-shrink: 0;
                     }
 
                     .error-message {
@@ -819,6 +1281,7 @@ const Register = () => {
                         gap: 0.5rem;
                         position: relative;
                         overflow: hidden;
+                        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
                     }
 
                     .register-button::before {
@@ -890,10 +1353,33 @@ const Register = () => {
                     }
 
                     .social-register {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 1rem;
+                        margin-bottom: 2rem;
+                        border: 2px solid #e2e8f0;
+                        border-radius: 12px;
+                        padding: 1.5rem;
+                        background: rgba(255, 255, 255, 0.5);
+                        backdrop-filter: blur(10px);
+                    }
+
+                    .coming-soon-text {
+                        text-align: center;
+                        color: #718096;
+                        font-size: 0.9rem;
+                        font-weight: 500;
+                        margin-bottom: 1rem;
+                        padding: 0.5rem;
+                        background: rgba(102, 126, 234, 0.1);
+                        border-radius: 8px;
+                        border: 1px solid rgba(102, 126, 234, 0.2);
+                    }
+
+                    .social-buttons-container {
                         display: grid;
                         grid-template-columns: 1fr 1fr 1fr;
                         gap: 1rem;
-                        margin-bottom: 2rem;
                     }
 
                     .social-button {
@@ -910,6 +1396,7 @@ const Register = () => {
                         font-size: 0.8rem;
                         font-weight: 600;
                         color: #4a5568;
+                        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
                     }
 
                     .social-button:hover {
@@ -962,7 +1449,24 @@ const Register = () => {
                         }
 
                         .social-register {
+                            padding: 1rem;
+                        }
+
+                        .social-buttons-container {
                             grid-template-columns: 1fr;
+                        }
+
+                        .suggested-password-display {
+                            flex-direction: column;
+                            gap: 0.75rem;
+                        }
+
+                        .password-security-info {
+                            grid-template-columns: 1fr;
+                        }
+
+                        .use-password-btn {
+                            width: 100%;
                         }
                     }
                 `}</style>

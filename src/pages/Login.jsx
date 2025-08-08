@@ -171,7 +171,6 @@ const Login = () => {
                     className="form-input"
                     required
                   />
-                  <div className="input-line"></div>
                 </div>
                 <AnimatePresence>
                   {errors.email && (
@@ -213,7 +212,6 @@ const Login = () => {
                   >
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </button>
-                  <div className="input-line"></div>
                 </div>
                 <AnimatePresence>
                   {errors.password && (
@@ -277,43 +275,48 @@ const Login = () => {
                 <span>or continue with</span>
               </motion.div>
 
-              <motion.div 
-                className="social-login"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.1, duration: 0.6 }}
-              >
-                <button
-                  type="button"
-                  className="social-button google"
-                  onClick={() => handleSocialLogin('Google')}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <FaGoogle />
-                  Google
-                </button>
-                <button
-                  type="button"
-                  className="social-button facebook"
-                  onClick={() => handleSocialLogin('Facebook')}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <FaFacebook />
-                  Facebook
-                </button>
-                <button
-                  type="button"
-                  className="social-button twitter"
-                  onClick={() => handleSocialLogin('Twitter')}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <FaTwitter />
-                  Twitter
-                </button>
-              </motion.div>
+                             <motion.div 
+                 className="social-login"
+                 initial={{ opacity: 0, y: 20 }}
+                 animate={{ opacity: 1, y: 0 }}
+                 transition={{ delay: 1.1, duration: 0.6 }}
+               >
+                 <div className="coming-soon-text">
+                   This feature will be add in next update
+                 </div>
+                 <div className="social-buttons-container">
+                   <button
+                     type="button"
+                     className="social-button google"
+                     onClick={() => handleSocialLogin('Google')}
+                     whileHover={{ scale: 1.05 }}
+                     whileTap={{ scale: 0.95 }}
+                   >
+                     <FaGoogle />
+                     Google
+                   </button>
+                   <button
+                     type="button"
+                     className="social-button facebook"
+                     onClick={() => handleSocialLogin('Facebook')}
+                     whileHover={{ scale: 1.05 }}
+                     whileTap={{ scale: 0.95 }}
+                   >
+                     <FaFacebook />
+                     Facebook
+                   </button>
+                   <button
+                     type="button"
+                     className="social-button twitter"
+                     onClick={() => handleSocialLogin('Twitter')}
+                     whileHover={{ scale: 1.05 }}
+                     whileTap={{ scale: 0.95 }}
+                   >
+                     <FaTwitter />
+                     Twitter
+                   </button>
+                 </div>
+               </motion.div>
 
               <motion.div 
                 className="register-link"
@@ -471,7 +474,6 @@ const Login = () => {
           .login-form {
             display: flex;
             flex-direction: column;
-            gap: 1.5rem;
           }
 
           .form-group {
@@ -482,15 +484,20 @@ const Login = () => {
             position: relative;
             display: flex;
             align-items: center;
+            margin-bottom: 0.5rem;
           }
 
           .input-icon {
             position: absolute;
             left: 1rem;
-            color: #a0aec0;
-            font-size: 1.1rem;
+            color: #667eea;
+            font-size: 1rem;
             transition: all 0.3s ease;
             z-index: 2;
+            background: rgba(102, 126, 234, 0.1);
+            padding: 0.5rem;
+            border-radius: 8px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
           }
 
           .form-input {
@@ -499,55 +506,72 @@ const Login = () => {
             border: 2px solid #e2e8f0;
             border-radius: 12px;
             font-size: 1rem;
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.9);
             transition: all 0.3s ease;
             outline: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+          }
+
+          .form-input:hover {
+            border-color: #cbd5e0;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
           }
 
           .form-input:focus {
             border-color: #667eea;
             background: white;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1), 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
           }
 
           .form-group.focused .input-icon {
             color: #667eea;
+            background: rgba(102, 126, 234, 0.15);
+            border-color: rgba(102, 126, 234, 0.3);
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
           }
 
           .form-group.error .form-input {
             border-color: #e53e3e;
-            box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1);
+            box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1), 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
+          }
+
+          .form-group.error .form-input:hover {
+            border-color: #e53e3e;
+            box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1), 0 6px 16px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
           }
 
           .password-toggle {
             position: absolute;
             right: 1rem;
-            background: none;
-            border: none;
-            color: #a0aec0;
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            color: #667eea;
             cursor: pointer;
-            font-size: 1.1rem;
-            transition: color 0.3s ease;
+            font-size: 1rem;
+            transition: all 0.3s ease;
             z-index: 2;
+            padding: 0.5rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
           }
 
           .password-toggle:hover {
             color: #667eea;
+            background: rgba(102, 126, 234, 0.15);
+            border-color: rgba(102, 126, 234, 0.3);
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
           }
 
-          .input-line {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            transition: width 0.3s ease;
-          }
 
-          .form-group.focused .input-line {
-            width: 100%;
-          }
 
           .error-message {
             color: #e53e3e;
@@ -698,12 +722,35 @@ const Login = () => {
             font-size: 0.9rem;
           }
 
-          .social-login {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 1rem;
-            margin-bottom: 2rem;
-          }
+                     .social-login {
+             display: flex;
+             flex-direction: column;
+             gap: 1rem;
+             margin-bottom: 2rem;
+             border: 2px solid #e2e8f0;
+             border-radius: 12px;
+             padding: 1.5rem;
+             background: rgba(255, 255, 255, 0.5);
+             backdrop-filter: blur(10px);
+           }
+
+           .coming-soon-text {
+             text-align: center;
+             color: #718096;
+             font-size: 0.9rem;
+             font-weight: 500;
+             margin-bottom: 1rem;
+             padding: 0.5rem;
+             background: rgba(102, 126, 234, 0.1);
+             border-radius: 8px;
+             border: 1px solid rgba(102, 126, 234, 0.2);
+           }
+
+           .social-buttons-container {
+             display: grid;
+             grid-template-columns: 1fr 1fr 1fr;
+             gap: 1rem;
+           }
 
           .social-button {
             background: white;
@@ -770,9 +817,13 @@ const Login = () => {
               font-size: 1.8rem;
             }
 
-            .social-login {
-              grid-template-columns: 1fr;
-            }
+                         .social-login {
+               padding: 1rem;
+             }
+
+             .social-buttons-container {
+               grid-template-columns: 1fr;
+             }
           }
         `}</style>
       </div>
