@@ -102,8 +102,8 @@ const Register = () => {
             newErrors.password = 'Password is required';
         } else if (formData.password.length < 8) {
             newErrors.password = 'Password must be at least 8 characters';
-        } else if (passwordStrength < 3) {
-            newErrors.password = 'Password is too weak';
+        } else if (!Object.values(passwordRequirements).every(req => req)) {
+            newErrors.password = 'Password must meet all requirements';
         }
         
         if (!formData.confirmPassword) {
@@ -114,6 +114,16 @@ const Register = () => {
         
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
+    };
+
+    // Check if form is valid for button state
+    const isFormValid = () => {
+        return formData.fullName.trim().length >= 2 &&
+               /\S+@\S+\.\S+/.test(formData.email) &&
+               formData.password.length >= 8 &&
+               Object.values(passwordRequirements).every(req => req) &&
+               formData.password === formData.confirmPassword &&
+               formData.confirmPassword.length > 0;
     };
 
     const handleSubmit = async (e) => {
@@ -511,6 +521,18 @@ const Register = () => {
                                             {getPasswordStrengthText()}
                                         </span>
                                         </div>
+                                        
+                                        {Object.values(passwordRequirements).every(req => req) && (
+                                            <motion.div 
+                                                className="password-valid"
+                                                initial={{ opacity: 0, scale: 0.8 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                transition={{ duration: 0.3 }}
+                                            >
+                                                <FaCheckCircle className="valid-icon" />
+                                                <span>Password meets all requirements!</span>
+                                            </motion.div>
+                                        )}
                                     </motion.div>
                                 )}
                                 
@@ -646,10 +668,10 @@ const Register = () => {
 
                             <motion.button
                                 type="submit"
-                                className={`register-button ${isLoading ? 'loading' : ''}`}
-                                disabled={isLoading}
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
+                                className={`register-button ${isLoading ? 'loading' : ''} ${!isFormValid() ? 'disabled' : ''}`}
+                                disabled={isLoading || !isFormValid()}
+                                whileHover={isFormValid() ? { scale: 1.02 } : {}}
+                                whileTap={isFormValid() ? { scale: 0.98 } : {}}
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 1.1, duration: 0.6 }}
@@ -1089,6 +1111,25 @@ const Register = () => {
                         min-width: 60px;
                     }
 
+                    .password-valid {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        margin-top: 0.75rem;
+                        padding: 0.5rem;
+                        background: rgba(56, 161, 105, 0.1);
+                        border: 1px solid rgba(56, 161, 105, 0.2);
+                        border-radius: 8px;
+                        color: #38a169;
+                        font-size: 0.8rem;
+                        font-weight: 600;
+                    }
+
+                    .valid-icon {
+                        color: #38a169;
+                        font-size: 1rem;
+                    }
+
                     .ai-password-suggestion {
                         margin-top: 1rem;
                     }
@@ -1304,9 +1345,18 @@ const Register = () => {
                         box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
                     }
 
-                    .register-button:disabled {
-                        opacity: 0.7;
+                    .register-button:disabled,
+                    .register-button.disabled {
+                        opacity: 0.5;
                         cursor: not-allowed;
+                        transform: none !important;
+                        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+                    }
+
+                    .register-button:disabled:hover,
+                    .register-button.disabled:hover {
+                        transform: none !important;
+                        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
                     }
 
                     .loading-spinner {

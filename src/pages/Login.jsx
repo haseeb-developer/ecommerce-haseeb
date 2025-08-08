@@ -64,6 +64,13 @@ const Login = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Check if form is valid for button state
+  const isFormValid = () => {
+    return formData.email.length > 0 &&
+           /\S+@\S+\.\S+/.test(formData.email) &&
+           formData.password.length >= 6;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -245,10 +252,10 @@ const Login = () => {
 
               <motion.button
                 type="submit"
-                className={`login-button ${isLoading ? 'loading' : ''}`}
-                disabled={isLoading}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                className={`login-button ${isLoading ? 'loading' : ''} ${!isFormValid() ? 'disabled' : ''}`}
+                disabled={isLoading || !isFormValid()}
+                whileHover={isFormValid() ? { scale: 1.02 } : {}}
+                whileTap={isFormValid() ? { scale: 0.98 } : {}}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.9, duration: 0.6 }}
@@ -674,9 +681,18 @@ const Login = () => {
             box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
           }
 
-          .login-button:disabled {
-            opacity: 0.7;
+          .login-button:disabled,
+          .login-button.disabled {
+            opacity: 0.5;
             cursor: not-allowed;
+            transform: none !important;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2) !important;
+          }
+
+          .login-button:disabled:hover,
+          .login-button.disabled:hover {
+            transform: none !important;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2) !important;
           }
 
           .loading-spinner {
