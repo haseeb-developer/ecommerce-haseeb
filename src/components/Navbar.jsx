@@ -21,11 +21,17 @@ import { logoutUser, loginUser } from '../redux/action'
 const Navbar = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const cartState = useSelector(state => state.handleCart)
     const authState = useSelector(state => state.handleAuth)
     const totalQty = authState.isAuthenticated 
         ? authState.cart.reduce((acc, item) => acc + (item.qty || 1), 0)
         : authState.tempCart.reduce((acc, item) => acc + (item.qty || 1), 0);
+    
+    // Debug logging
+    console.log('Auth State:', authState);
+    console.log('Cart:', authState.cart);
+    console.log('Temp Cart:', authState.tempCart);
+    console.log('Is Authenticated:', authState.isAuthenticated);
+    console.log('Total Qty:', totalQty);
     const location = useLocation();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
@@ -80,6 +86,16 @@ const Navbar = () => {
             }
         }
     }, [dispatch, authState.isAuthenticated]);
+
+    // Monitor cart changes
+    useEffect(() => {
+        console.log('Cart state changed:', {
+            cart: authState.cart,
+            tempCart: authState.tempCart,
+            isAuthenticated: authState.isAuthenticated,
+            totalQty: totalQty
+        });
+    }, [authState.cart, authState.tempCart, authState.isAuthenticated, totalQty]);
 
     return (
         <>

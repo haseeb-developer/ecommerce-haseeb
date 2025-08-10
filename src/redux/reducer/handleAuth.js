@@ -1,44 +1,92 @@
-const initialState = {
-    isAuthenticated: false,
-    user: null,
-    cart: [],
-    tempCart: [] // For non-authenticated users
+const getInitialState = () => {
+    const storedAuth = localStorage.getItem('authState');
+    console.log('Loading from localStorage:', storedAuth);
+    
+    if (storedAuth) {
+        try {
+            const parsed = JSON.parse(storedAuth);
+            console.log('Parsed auth state:', parsed);
+            return {
+                isAuthenticated: parsed.isAuthenticated || false,
+                user: parsed.user || null,
+                cart: parsed.cart || [],
+                tempCart: parsed.tempCart || []
+            };
+        } catch (error) {
+            console.error('Error parsing stored auth state:', error);
+        }
+    }
+    
+    console.log('Using default initial state');
+    return {
+        isAuthenticated: false,
+        user: null,
+        cart: [],
+        tempCart: [] // For non-authenticated users
+    };
+};
+
+const initialState = getInitialState();
+
+// Helper function to save state to localStorage
+const saveToLocalStorage = (state) => {
+    try {
+        localStorage.setItem('authState', JSON.stringify(state));
+        console.log('Saved to localStorage:', state);
+    } catch (error) {
+        console.error('Error saving auth state to localStorage:', error);
+    }
 };
 
 const handleAuth = (state = initialState, action) => {
+    let newState;
+    
     switch (action.type) {
         case "REGISTER_USER":
-            return {
+            newState = {
                 ...state,
                 isAuthenticated: false,
                 user: action.payload,
                 cart: [],
                 tempCart: state.tempCart // Keep temp cart for login
             };
+            saveToLocalStorage(newState);
+            return newState;
 
         case "LOGIN_USER":
-            return {
+            // Merge temp cart with user cart if user has no existing cart
+            const userCart = action.payload.cart || [];
+            const mergedCart = userCart.length > 0 ? userCart : state.tempCart;
+            
+            newState = {
                 ...state,
                 isAuthenticated: true,
                 user: action.payload,
-                cart: action.payload.cart || [],
+                cart: mergedCart,
                 tempCart: [] // Clear temp cart after login
             };
+            saveToLocalStorage(newState);
+            return newState;
 
         case "LOGOUT_USER":
-            return {
+            newState = {
                 ...state,
                 isAuthenticated: false,
                 user: null,
                 cart: [],
                 tempCart: []
             };
+            saveToLocalStorage(newState);
+            return newState;
 
         case "ADD_TO_CART":
+            console.log('ADD_TO_CART action:', action.payload);
+            console.log('Current state:', state);
+            
             if (state.isAuthenticated) {
                 const existingItem = state.cart.find(item => item.id === action.payload.id);
                 if (existingItem) {
-                    return {
+                    newState = {
                         ...state,
                         cart: state.cart.map(item =>
                             item.id === action.payload.id
@@ -47,7 +95,7 @@ const handleAuth = (state = initialState, action) => {
                         )
                     };
                 } else {
-                    return {
+                    newState = {
                         ...state,
                         cart: [...state.cart, { ...action.payload, qty: 1 }]
                     };
@@ -56,7 +104,7 @@ const handleAuth = (state = initialState, action) => {
                 // For non-authenticated users, add to temp cart
                 const existingItem = state.tempCart.find(item => item.id === action.payload.id);
                 if (existingItem) {
-                    return {
+                    newState = {
                         ...state,
                         tempCart: state.tempCart.map(item =>
                             item.id === action.payload.id
@@ -65,29 +113,35 @@ const handleAuth = (state = initialState, action) => {
                         )
                     };
                 } else {
-                    return {
+                    newState = {
                         ...state,
                         tempCart: [...state.tempCart, { ...action.payload, qty: 1 }]
                     };
                 }
             }
+            
+            console.log('New state:', newState);
+            saveToLocalStorage(newState);
+            return newState;
 
         case "REMOVE_FROM_CART":
             if (state.isAuthenticated) {
-                return {
+                newState = {
                     ...state,
                     cart: state.cart.filter(item => item.id !== action.payload.id)
                 };
             } else {
-                return {
+                newState = {
                     ...state,
                     tempCart: state.tempCart.filter(item => item.id !== action.payload.id)
                 };
             }
+            saveToLocalStorage(newState);
+            return newState;
 
         case "UPDATE_CART_QUANTITY":
             if (state.isAuthenticated) {
-                return {
+                newState = {
                     ...state,
                     cart: state.cart.map(item =>
                         item.id === action.payload.id
@@ -96,7 +150,7 @@ const handleAuth = (state = initialState, action) => {
                     )
                 };
             } else {
-                return {
+                newState = {
                     ...state,
                     tempCart: state.tempCart.map(item =>
                         item.id === action.payload.id
@@ -105,19 +159,23 @@ const handleAuth = (state = initialState, action) => {
                     )
                 };
             }
+            saveToLocalStorage(newState);
+            return newState;
 
         case "CLEAR_CART":
             if (state.isAuthenticated) {
-                return {
+                newState = {
                     ...state,
                     cart: []
                 };
             } else {
-                return {
+                newState = {
                     ...state,
                     tempCart: []
                 };
             }
+            saveToLocalStorage(newState);
+            return newState;
 
         default:
             return state;

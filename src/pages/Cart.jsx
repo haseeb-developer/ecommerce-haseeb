@@ -1,7 +1,7 @@
 import React from "react";
 import { Footer, Navbar } from "../components";
 import { useSelector, useDispatch } from "react-redux";
-import { removeFromCart, updateCartQuantity } from "../redux/action";
+import { removeFromCart, updateCartQuantity, clearCart } from "../redux/action";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import "./Cart.css";
@@ -273,6 +273,10 @@ const Cart = () => {
 
   const removeProduct = (product) => {
     dispatch(removeFromCart(product));
+  };
+
+  const clearAllItems = () => {
+    dispatch(clearCart());
   };
 
   const ShowCart = () => {

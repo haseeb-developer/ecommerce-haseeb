@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { addToCart } from "../redux/action";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
@@ -44,11 +44,25 @@ const Products = () => {
   let componentMounted = true;
 
   const dispatch = useDispatch();
+  const authState = useSelector(state => state.handleAuth);
 
   const addProduct = (product) => {
     const inStock = product.rating?.count > 0 && product.id % 3 !== 0;
-    dispatch(addToCart({ ...product, inStock }));
+    const productWithStock = { ...product, inStock };
+    console.log('Adding product to cart:', productWithStock);
+    console.log('Current auth state before dispatch:', authState);
+    dispatch(addToCart(productWithStock));
+    console.log('Product added to cart, action dispatched');
   };
+
+  // Monitor cart changes
+  useEffect(() => {
+    console.log('Products component - Cart state changed:', {
+      cart: authState.cart,
+      tempCart: authState.tempCart,
+      isAuthenticated: authState.isAuthenticated
+    });
+  }, [authState.cart, authState.tempCart, authState.isAuthenticated]);
 
   useEffect(() => {
     const handleResize = () => {
