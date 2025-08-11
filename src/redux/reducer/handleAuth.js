@@ -1,4 +1,15 @@
 const getInitialState = () => {
+    // Check if localStorage is available (client-side only)
+    if (typeof window === 'undefined' || !window.localStorage) {
+        console.log('localStorage not available, using default state');
+        return {
+            isAuthenticated: false,
+            user: null,
+            cart: [],
+            tempCart: []
+        };
+    }
+    
     const storedAuth = localStorage.getItem('authState');
     console.log('Loading from localStorage:', storedAuth);
     
@@ -30,6 +41,12 @@ const initialState = getInitialState();
 
 // Helper function to save state to localStorage
 const saveToLocalStorage = (state) => {
+    // Check if localStorage is available (client-side only)
+    if (typeof window === 'undefined' || !window.localStorage) {
+        console.log('localStorage not available, skipping save');
+        return;
+    }
+    
     try {
         localStorage.setItem('authState', JSON.stringify(state));
         console.log('Saved to localStorage:', state);

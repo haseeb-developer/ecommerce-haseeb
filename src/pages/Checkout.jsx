@@ -1,9 +1,67 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Footer, Navbar } from "../components";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 const Checkout = () => {
-  const state = useSelector((state) => state.handleCart);
+  const authState = useSelector((state) => state.handleAuth);
+  const [isHydrated, setIsHydrated] = useState(false);
+  
+  // Use the same cart state as Cart component
+  const state = authState.isAuthenticated ? authState.cart : authState.tempCart;
+
+  // Debug logging
+  useEffect(() => {
+    console.log('Checkout component mounted');
+    console.log('authState:', authState);
+    console.log('cart state:', state);
+    console.log('state length:', state.length);
+    console.log('isAuthenticated:', authState.isAuthenticated);
+    console.log('authState.cart:', authState.cart);
+    console.log('authState.tempCart:', authState.tempCart);
+    
+    // Also check localStorage directly for debugging
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const storedAuth = localStorage.getItem('authState');
+      console.log('localStorage authState:', storedAuth);
+      if (storedAuth) {
+        try {
+          const parsed = JSON.parse(storedAuth);
+          console.log('Parsed localStorage:', parsed);
+          console.log('localStorage cart length:', parsed.cart?.length || 0);
+          console.log('localStorage tempCart length:', parsed.tempCart?.length || 0);
+        } catch (error) {
+          console.error('Error parsing localStorage:', error);
+        }
+      }
+    }
+    
+    // Set hydrated after a short delay to ensure localStorage is loaded
+    const timer = setTimeout(() => {
+      setIsHydrated(true);
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, [authState, state]);
+
+  // Don't render until hydrated to prevent flash of empty cart
+  if (!isHydrated) {
+    return (
+      <>
+        <Navbar />
+        <div className="container my-3 py-3">
+          <h1 className="text-center">Checkout</h1>
+          <hr />
+          <div className="text-center">
+            <div className="spinner-border" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+            <p className="mt-3">Loading cart...</p>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
+  }
 
   const EmptyCart = () => {
     return (
@@ -24,6 +82,10 @@ const Checkout = () => {
     let subtotal = 0;
     let shipping = 30.0;
     let totalItems = 0;
+    
+    console.log('ShowCheckout called with state:', state);
+    console.log('State length in ShowCheckout:', state.length);
+    
     state.map((item) => {
       return (subtotal += item.price * item.qty);
     });
@@ -31,6 +93,10 @@ const Checkout = () => {
     state.map((item) => {
       return (totalItems += item.qty);
     });
+    
+    console.log('Calculated subtotal:', subtotal);
+    console.log('Calculated totalItems:', totalItems);
+    
     return (
       <>
         <div className="container py-5">
@@ -154,7 +220,7 @@ const Checkout = () => {
                         <br />
                         <select className="form-select" id="country" required>
                           <option value="">Choose...</option>
-                          <option>India</option>
+                          <option>Pakistan</option>
                         </select>
                         <div className="invalid-feedback">
                           Please select a valid country.
@@ -168,7 +234,7 @@ const Checkout = () => {
                         <br />
                         <select className="form-select" id="state" required>
                           <option value="">Choose...</option>
-                          <option>Punjab</option>
+                          <option>Islamabad</option>
                         </select>
                         <div className="invalid-feedback">
                           Please provide a valid state.
@@ -288,7 +354,18 @@ const Checkout = () => {
       <div className="container my-3 py-3">
         <h1 className="text-center">Checkout</h1>
         <hr />
-        {state.length ? <ShowCheckout /> : <EmptyCart />}
+        {(() => {
+          console.log('Render logic - state:', state);
+          console.log('Render logic - state.length:', state.length);
+          
+          if (state.length) {
+            console.log('Rendering ShowCheckout');
+            return <ShowCheckout />;
+          } else {
+            console.log('Rendering EmptyCart');
+            return <EmptyCart />;
+          }
+        })()}
       </div>
       <Footer />
     </>

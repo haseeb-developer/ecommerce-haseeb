@@ -204,22 +204,22 @@ const Product = () => {
       setLoading2(true);
       try {
         console.log('Fetching product with ID:', id);
-        const response = await fetch(`https://fakestoreapi.com/products/${id}`);
+      const response = await fetch(`https://fakestoreapi.com/products/${id}`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const data = await response.json();
+      const data = await response.json();
         console.log('Product data received:', data);
-        setProduct(data);
-        setLoading(false);
+      setProduct(data);
+      setLoading(false);
         
         // Fetch similar products from the same category
         if (data.category) {
-          const response2 = await fetch(
-            `https://fakestoreapi.com/products/category/${data.category}`
-          );
+      const response2 = await fetch(
+        `https://fakestoreapi.com/products/category/${data.category}`
+      );
           if (response2.ok) {
-            const data2 = await response2.json();
+      const data2 = await response2.json();
             
             // Filter out products without valid images and limit to 4
             const validProducts = data2
@@ -233,7 +233,7 @@ const Product = () => {
       } catch (error) {
         console.error('Error fetching product data:', error);
         setLoading(false);
-        setLoading2(false);
+      setLoading2(false);
       }
     };
     getProduct();
@@ -316,10 +316,10 @@ const Product = () => {
                   opacity: '0.1'
                 }}></div>
                 
-                <img
-                  className="img-fluid"
-                  src={product.image}
-                  alt={product.title}
+              <img
+                className="img-fluid"
+                src={product.image}
+                alt={product.title}
                   style={{
                     width: '100%',
                     height: 'auto',
@@ -343,8 +343,8 @@ const Product = () => {
                       e.target.style.boxShadow = '0 8px 32px rgba(0,0,0,0.12)';
                     }
                   }}
-                />
-              </div>
+              />
+            </div>
             </div>
             <div className="col-lg-6 col-md-6 col-sm-12 py-md-3">
               <div style={{ 
@@ -455,98 +455,98 @@ const Product = () => {
                     alignItems: 'stretch',
                     marginTop: '32px'
                   }}>
-                    <button
+                <button
                       className="responsive-button"
-                      onClick={() => addProduct(product)}
-                      disabled={!inStock}
-                      style={{
+                  onClick={() => addProduct(product)}
+                  disabled={!inStock}
+                  style={{
                         background: inStock ? 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)' : '#e5e7eb',
-                        color: inStock ? '#fff' : '#b6c3d1',
-                        borderRadius: '50px',
+                    color: inStock ? '#fff' : '#b6c3d1',
+                    borderRadius: '50px',
                         padding: isMobile ? '16px 24px' : 'clamp(14px, 3vw, 18px) clamp(24px, 4vw, 32px)',
                         fontSize: isMobile ? '16px' : 'clamp(14px, 2.5vw, 16px)',
                         fontWeight: '700',
-                        cursor: inStock ? 'pointer' : 'not-allowed',
+                    cursor: inStock ? 'pointer' : 'not-allowed',
                         boxShadow: inStock ? '0 8px 24px rgba(37,99,235,0.3)' : 'none',
-                        transition: 'all 0.3s ease',
-                        display: 'flex',
-                        alignItems: 'center',
+                    transition: 'all 0.3s ease',
+                    display: 'flex',
+                    alignItems: 'center',
                         justifyContent: 'center',
-                        gap: '12px',
-                        position: 'relative',
-                        overflow: 'hidden',
+                    gap: '12px',
+                    position: 'relative',
+                    overflow: 'hidden',
                         minHeight: '56px',
                         width: '100%',
                         maxWidth: isMobile ? '100%' : 'auto',
                         border: inStock ? '2px solid rgba(255,255,255,0.2)' : 'none'
-                      }}
-                      onMouseEnter={(e) => {
+                  }}
+                  onMouseEnter={(e) => {
                         if (inStock && !isMobile) {
                           e.target.style.transform = 'translateY(-3px) scale(1.02)';
                           e.target.style.boxShadow = '0 12px 32px rgba(37,99,235,0.4)';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
+                    }
+                  }}
+                  onMouseLeave={(e) => {
                         if (inStock && !isMobile) {
                           e.target.style.transform = 'translateY(0) scale(1)';
                           e.target.style.boxShadow = '0 8px 24px rgba(37,99,235,0.3)';
-                        }
-                      }}
-                    >
-                      <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01M12 12h.01" />
-                      </svg>
-                      Add to Cart
-                    </button>
-                    <Link 
+                    }
+                  }}
+                >
+                  <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01M12 12h.01" />
+                  </svg>
+                  Add to Cart
+                </button>
+                <Link 
                       className="responsive-button"
-                      to="/cart" 
-                      style={{
+                  to="/cart" 
+                  style={{
                         background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
-                        color: '#2563eb',
-                        border: '2px solid #2563eb',
-                        borderRadius: '50px',
+                    color: '#2563eb',
+                    border: '2px solid #2563eb',
+                    borderRadius: '50px',
                         padding: isMobile ? '16px 24px' : 'clamp(14px, 3vw, 18px) clamp(24px, 4vw, 32px)',
                         fontSize: isMobile ? '16px' : 'clamp(14px, 2.5vw, 16px)',
                         fontWeight: '700',
-                        textDecoration: 'none',
-                        transition: 'all 0.3s ease',
-                        display: 'flex',
-                        alignItems: 'center',
+                    textDecoration: 'none',
+                    transition: 'all 0.3s ease',
+                    display: 'flex',
+                    alignItems: 'center',
                         justifyContent: 'center',
-                        gap: '12px',
+                    gap: '12px',
                         minHeight: '56px',
                         width: '100%',
                         maxWidth: isMobile ? '100%' : 'auto',
                         boxShadow: '0 4px 16px rgba(37,99,235,0.1)'
-                      }}
-                      onMouseEnter={(e) => {
+                  }}
+                  onMouseEnter={(e) => {
                         if (!isMobile) {
                           e.target.style.background = 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)';
-                          e.target.style.color = '#fff';
+                    e.target.style.color = '#fff';
                           e.target.style.transform = 'translateY(-3px) scale(1.02)';
                           e.target.style.boxShadow = '0 12px 32px rgba(37,99,235,0.3)';
                         }
-                      }}
-                      onMouseLeave={(e) => {
+                  }}
+                  onMouseLeave={(e) => {
                         if (!isMobile) {
                           e.target.style.background = 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)';
-                          e.target.style.color = '#2563eb';
+                    e.target.style.color = '#2563eb';
                           e.target.style.transform = 'translateY(0) scale(1)';
                           e.target.style.boxShadow = '0 4px 16px rgba(37,99,235,0.1)';
                         }
-                      }}
-                    >
-                      <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                      Go to Cart
-                    </Link>
+                  }}
+                >
+                  <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  Go to Cart
+                </Link>
                   </div>
-                </div>
               </div>
             </div>
           </div>
+        </div>
       </>
     );
   };
@@ -642,26 +642,26 @@ const Product = () => {
                     {item.image && item.image.trim() !== '' ? (
                       <img
                         className="card-img-top"
-                        src={item.image}
-                        alt={item.title}
-                        style={{ 
-                          objectFit: 'contain', 
+                      src={item.image}
+                      alt={item.title}
+                      style={{ 
+                        objectFit: 'contain', 
                           borderRadius: '8px', 
-                          width: '100%',
+                        width: '100%',
                           height: '100%',
                           transition: 'all 0.2s ease',
                           maxWidth: '100%',
                           maxHeight: '100%'
-                        }}
-                        onError={(e) => {
+                      }}
+                      onError={(e) => {
                           console.log('Image failed to load:', item.image);
-                          e.target.style.display = 'none';
+                        e.target.style.display = 'none';
                           const fallbackDiv = e.target.nextSibling;
                           if (fallbackDiv) {
                             fallbackDiv.style.display = 'flex';
                           }
-                        }}
-                      />
+                      }}
+                    />
                     ) : null}
                     <div 
                       style={{ 
@@ -795,13 +795,13 @@ const Product = () => {
                       onMouseEnter={(e) => {
                         if (!isMobile) {
                           e.target.style.background = 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)';
-                          e.target.style.color = '#fff';
+                        e.target.style.color = '#fff';
                         }
                       }}
                       onMouseLeave={(e) => {
                         if (!isMobile) {
                           e.target.style.background = 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)';
-                          e.target.style.color = '#2563eb';
+                        e.target.style.color = '#2563eb';
                         }
                       }}
                     >
@@ -843,13 +843,13 @@ const Product = () => {
                 {loading2 ? <Loading2 /> : <ShowSimilarProduct />}
               </div>
             ) : (
-              <Marquee
-                pauseOnHover={true}
-                pauseOnClick={true}
-                speed={50}
-              >
-                {loading2 ? <Loading2 /> : <ShowSimilarProduct />}
-              </Marquee>
+            <Marquee
+              pauseOnHover={true}
+              pauseOnClick={true}
+              speed={50}
+            >
+              {loading2 ? <Loading2 /> : <ShowSimilarProduct />}
+            </Marquee>
             )}
           </div>
         </div>
