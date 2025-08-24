@@ -31,9 +31,10 @@ const Products = () => {
   const [cardsPerPage, setCardsPerPage] = useState(() => {
     if (typeof window !== 'undefined') {
       if (window.innerWidth < 768) return 2;
-      if (window.innerWidth < 1000) return 6;
+      if (window.innerWidth < 1024) return 4;
+      if (window.innerWidth < 1440) return 6;
     }
-    return 9;
+    return 8;
   });
   const [isMobileOrTablet, setIsMobileOrTablet] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -68,10 +69,12 @@ const Products = () => {
     const handleResize = () => {
       if (window.innerWidth < 768) {
         setCardsPerPage(2);
-      } else if (window.innerWidth < 1000) {
+      } else if (window.innerWidth < 1024) {
+        setCardsPerPage(4);
+      } else if (window.innerWidth < 1440) {
         setCardsPerPage(6);
       } else {
-        setCardsPerPage(9);
+        setCardsPerPage(8);
       }
     };
     window.addEventListener('resize', handleResize);
@@ -233,53 +236,46 @@ const Products = () => {
       );
     }
     return (
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={page + '-' + activeFilter}
-          style={styles.grid}
-          className="products-grid"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 30 }}
-          transition={{ duration: 0.35, type: "spring", stiffness: 120, damping: 18 }}
-          layout
-        >
-          {paginated.map((product) => {
-            const inStock = product.stock !== undefined
-              ? product.stock > 0
-              : (product.rating?.count > 0 && product.id % 3 !== 0);
-            const variants = product.size || product.color || [];
-            return (
-              <motion.div
-                key={product.id}
-                style={styles.cardWrapper}
-                className="product-card-wrapper"
-                layout
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 30 }}
-                transition={{ duration: 0.3 }}
-              >
-                <ProductCard
-                  image={product.image}
-                  name={product.title}
-                  price={product.price}
-                  variants={Array.isArray(variants) ? variants : []}
-                  selectedVariant={Array.isArray(variants) ? variants[0] : ""}
-                  onVariantChange={() => {}}
-                  inStock={inStock}
-                  onAddToCart={() => {
-                    toast.success("Added to cart");
-                    addProduct(product);
-                  }}
-                  productId={product.id}
-                  showZoom={true}
-                />
-              </motion.div>
-            );
-          })}
-        </motion.div>
-      </AnimatePresence>
+      <motion.div
+        style={styles.grid}
+        className="products-grid"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, type: "spring", stiffness: 120, damping: 18 }}
+      >
+        {paginated.map((product) => {
+          const inStock = product.stock !== undefined
+            ? product.stock > 0
+            : (product.rating?.count > 0 && product.id % 3 !== 0);
+          const variants = product.size || product.color || [];
+          return (
+            <motion.div
+              key={product.id}
+              style={styles.cardWrapper}
+              className="product-card-wrapper"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <ProductCard
+                image={product.image}
+                name={product.title}
+                price={product.price}
+                variants={Array.isArray(variants) ? variants : []}
+                selectedVariant={Array.isArray(variants) ? variants[0] : ""}
+                onVariantChange={() => {}}
+                inStock={inStock}
+                onAddToCart={() => {
+                  toast.success("Added to cart");
+                  addProduct(product);
+                }}
+                productId={product.id}
+                showZoom={true}
+              />
+            </motion.div>
+          );
+        })}
+      </motion.div>
     );
   };
 
@@ -467,7 +463,7 @@ const styles = {
   },
   grid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))",
+    gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
     gap: "1.2rem 1rem",
     alignItems: "stretch",
     width: "100%",
@@ -591,6 +587,24 @@ const mobileStyle = `
       margin: 0 !important;
       padding: 0 !important;
       display: flex !important;
+    }
+  }
+  
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .products-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
+  }
+  
+  @media (min-width: 1025px) and (max-width: 1440px) {
+    .products-grid {
+      grid-template-columns: repeat(3, 1fr) !important;
+    }
+  }
+  
+  @media (min-width: 1441px) {
+    .products-grid {
+      grid-template-columns: repeat(4, 1fr) !important;
     }
   }
 `;

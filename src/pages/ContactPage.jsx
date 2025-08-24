@@ -5,7 +5,6 @@ import {
     FaEnvelope, 
     FaPhone, 
     FaMapMarkerAlt, 
-    FaClock, 
     FaUser, 
     FaPaperPlane,
     FaInstagram,
@@ -14,12 +13,9 @@ import {
     FaLinkedin,
     FaYoutube,
     FaWhatsapp,
-    FaHeadset,
     FaComments,
     FaRocket,
-    FaCheckCircle,
-    FaTimes,
-    FaStar
+    FaCheckCircle
 } from 'react-icons/fa';
 
 const ContactPage = () => {
@@ -35,7 +31,6 @@ const ContactPage = () => {
   const [focusedField, setFocusedField] = useState(null);
   const [activeContact, setActiveContact] = useState(0);
   const { scrollYProgress } = useScroll();
-  const y = useTransform(scrollYProgress, [0, 1], [0, -50]);
 
   useEffect(() => {
     const interval = setInterval(() => {

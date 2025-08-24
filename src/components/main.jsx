@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay, EffectFade } from 'swiper/modules';
-import { motion, AnimatePresence } from 'framer-motion';
+
 
 // Import Swiper styles
 import 'swiper/css';
@@ -46,7 +46,7 @@ const heroSlides = [
 ];
 
 const Home = () => {
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [, setActiveIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {

@@ -1,31 +1,23 @@
 import React, { useState, useEffect } from 'react'
 import { Footer, Navbar } from "../components";
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { 
     FaRocket, 
     FaUsers, 
     FaAward, 
     FaGlobe, 
     FaHeart, 
-    FaStar, 
     FaShoppingBag,
     FaTshirt,
     FaGem,
     FaLaptop,
-    FaArrowRight,
-    FaPlay,
-    FaInstagram,
-    FaTwitter,
-    FaFacebook,
-    FaLinkedin,
-    FaYoutube
+    FaPlay
 } from 'react-icons/fa';
 
 const AboutPage = () => {
   const [activeSection, setActiveSection] = useState(0);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const { scrollYProgress } = useScroll();
-  const y = useTransform(scrollYProgress, [0, 1], [0, -50]);
 
   useEffect(() => {
     const interval = setInterval(() => {

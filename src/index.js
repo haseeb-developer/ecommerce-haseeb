@@ -21,6 +21,7 @@ import {
   Privacy,
   ForgotPassword,
   ResetPassword,
+  WishList,
 } from "./pages";
 import ScrollToTop from "./components/ScrollToTop";
 import { Toaster } from "react-hot-toast";
@@ -34,7 +35,7 @@ root.render(
           <Route path="/" element={<Home />} />
           <Route path="/product" element={<Products />} />
           <Route path="/product/:id" element={<Product />} />
-          <Route path="/about" element={<AboutPage />} />
+          <Route path="/about" element={<AboutPage />} /> 
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/login" element={<Login />} />
@@ -44,6 +45,7 @@ root.render(
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/wishlist" element={<WishList />} />
           <Route path="*" element={<PageNotFound />} />
           <Route path="/product/*" element={<PageNotFound />} />
         </Routes>

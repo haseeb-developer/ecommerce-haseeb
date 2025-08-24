@@ -1,7 +1,11 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useCallback } from "react";
 import PropTypes from "prop-types";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { FaHeart } from "react-icons/fa";
+import { addToWishlist, removeFromWishlist } from "../redux/action";
+import Notification from "./Notification";
 
 const cartIcon = (
   <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><path d="M6.5 17a1.5 1.5 0 100 3 1.5 1.5 0 000-3zm7 0a1.5 1.5 0 100 3 1.5 1.5 0 000-3zM2 2h2.5l2.1 10.39a2 2 0 002 1.61h6.88a2 2 0 001.98-1.75l.7-6.25H5.12" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -24,7 +28,7 @@ const checkIcon = (
   <svg width="22" height="22" fill="none" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#22c55e"/><path d="M7 11.5l3 3 5-5" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
 );
 
-const ProductCard = ({
+const ProductCard = ({  
   image,
   name,
   price,
@@ -35,7 +39,7 @@ const ProductCard = ({
   onAddToCart,
   disabled = false,
   productId, 
-  showZoom = true,
+  showZoom = true,  
 }) => {
   const buttonRef = useRef(null);
   const [showModal, setShowModal] = useState(false);
@@ -43,7 +47,16 @@ const ProductCard = ({
   const [cartAnim, setCartAnim] = useState(false);
   const [cartIconAnim, setCartIconAnim] = useState(false);
   const [showCheck, setShowCheck] = useState(false);
+  const [wishlistAnim, setWishlistAnim] = useState(false);
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState('');
+  const [notificationType, setNotificationType] = useState('success');
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const authState = useSelector(state => state.handleAuth);
+  
+  const wishlistItems = authState.isAuthenticated ? authState.wishlist : authState.tempWishlist;
+  const isInWishlist = wishlistItems.some(item => item.id === productId);
   
   const handleButtonClick = (e) => {
     if (!inStock || disabled) return;
@@ -82,6 +95,42 @@ const ProductCard = ({
     }, 2000);
   };
 
+  const handleWishlistClick = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setWishlistAnim(true);
+    
+    const product = {
+      id: productId,
+      name,
+      price,
+      image,
+      inStock
+    };
+    
+    // Use setTimeout to defer the dispatch and prevent immediate re-render
+    setTimeout(() => {
+      if (isInWishlist) {
+        dispatch(removeFromWishlist(productId));
+        setNotificationMessage('Item removed from wishlist');
+        setNotificationType('success');
+      } else {
+        dispatch(addToWishlist(product));
+        setNotificationMessage('Item added to wishlist');
+        setNotificationType('wishlist');
+      }
+      
+      setShowNotification(true);
+      setTimeout(() => {
+        setShowNotification(false);
+      }, 3000);
+    }, 0);
+    
+    setTimeout(() => {
+      setWishlistAnim(false);
+    }, 500);
+  }, [productId, name, price, image, inStock, isInWishlist, dispatch]);
+
   return (
     <>
       <motion.div
@@ -97,12 +146,13 @@ const ProductCard = ({
         transition={{ duration: 0.3 }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
+        onMouseDown={(e) => e.preventDefault()}
       >
         <div style={styles.flexCol}>
           <div style={styles.imageWrapper}>
             <img src={image} alt={name} style={styles.image} />
             {showZoom && (
-              <AnimatePresence>
+              <AnimatePresence mode="wait">
                 {hovered && (
                   <motion.button
                     style={styles.zoomBtn}
@@ -110,7 +160,12 @@ const ProductCard = ({
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.7 }}
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                    onClick={e => { e.stopPropagation(); setShowModal(true); }}
+                    onClick={e => { 
+                      e.preventDefault();
+                      e.stopPropagation(); 
+                      setShowModal(true); 
+                    }}
+                    onMouseDown={e => e.preventDefault()}
                     tabIndex={-1}
                   >
                     {zoomIcon}
@@ -118,6 +173,37 @@ const ProductCard = ({
                 )}
               </AnimatePresence>
             )}
+            
+            <AnimatePresence mode="wait">
+              {(hovered || isInWishlist) && (
+                <motion.button
+                  style={{
+                    ...styles.zoomBtn,
+                    top: showZoom ? 60 : 12,
+                    background: isInWishlist ? '#ef4444' : '#fff',
+                    color: isInWishlist ? '#fff' : '#ef4444'
+                  }}
+                  initial={{ opacity: 0, scale: 0.7 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.7 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  onClick={handleWishlistClick}
+                  onMouseDown={e => e.preventDefault()}
+                  onMouseEnter={e => e.stopPropagation()}
+                  onMouseLeave={e => e.stopPropagation()}
+                  tabIndex={-1}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <FaHeart 
+                    style={{ 
+                      fontSize: '1.2rem',
+                      animation: wishlistAnim ? 'heartBeat 0.5s ease-in-out' : 'none'
+                    }} 
+                  />
+                </motion.button>
+              )}
+            </AnimatePresence>
           </div>
           <div style={styles.body}>
             <h3 style={styles.name} title={name}>{name}</h3>
@@ -311,6 +397,11 @@ const ProductCard = ({
               opacity: 0;
             }
           }
+          @keyframes heartBeat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+          }
           button { position: relative; overflow: hidden; font-family: 'Poppins', sans-serif; }
         `}</style>
       </motion.div>
@@ -340,6 +431,13 @@ const ProductCard = ({
           )}
         </AnimatePresence>
       )}
+      
+      <Notification
+        message={notificationMessage}
+        type={notificationType}
+        isVisible={showNotification}
+        onClose={() => setShowNotification(false)}
+      />
     </>
   );
 };
@@ -627,6 +725,7 @@ const styles = {
     maxHeight: '80vh',
     overflow: 'hidden',
     justifyContent: 'center',
+    transform: 'translateZ(0)',
   },
   modalImage: {
     maxWidth: '100%',

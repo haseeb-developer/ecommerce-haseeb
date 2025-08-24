@@ -68,3 +68,31 @@ export const clearCart = () => {
         type: "CLEAR_CART"
     }
 }
+
+// Wishlist Actions
+export const addToWishlist = (product) => {
+    return {
+        type: "ADD_TO_WISHLIST",
+        payload: product
+    }
+}
+
+export const removeFromWishlist = (productId) => {
+    return {
+        type: "REMOVE_FROM_WISHLIST",
+        payload: productId
+    }
+}
+
+export const setWishlist = (wishlist) => {
+    return {
+        type: "SET_WISHLIST",
+        payload: wishlist
+    }
+}
+
+export const clearWishlist = () => {
+    return {
+        type: "CLEAR_WISHLIST"
+    }
+}

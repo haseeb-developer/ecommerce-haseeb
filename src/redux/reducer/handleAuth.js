@@ -6,7 +6,9 @@ const getInitialState = () => {
             isAuthenticated: false,
             user: null,
             cart: [],
-            tempCart: []
+            tempCart: [],
+            wishlist: [],
+            tempWishlist: []
         };
     }
     
@@ -21,7 +23,9 @@ const getInitialState = () => {
                 isAuthenticated: parsed.isAuthenticated || false,
                 user: parsed.user || null,
                 cart: parsed.cart || [],
-                tempCart: parsed.tempCart || []
+                tempCart: parsed.tempCart || [],
+                wishlist: parsed.wishlist || [],
+                tempWishlist: parsed.tempWishlist || []
             };
         } catch (error) {
             console.error('Error parsing stored auth state:', error);
@@ -33,7 +37,9 @@ const getInitialState = () => {
         isAuthenticated: false,
         user: null,
         cart: [],
-        tempCart: [] // For non-authenticated users
+        tempCart: [], // For non-authenticated users
+        wishlist: [],
+        tempWishlist: [] // For non-authenticated users
     };
 };
 
@@ -75,12 +81,18 @@ const handleAuth = (state = initialState, action) => {
             const userCart = action.payload.cart || [];
             const mergedCart = userCart.length > 0 ? userCart : state.tempCart;
             
+            // Merge temp wishlist with user wishlist if user has no existing wishlist
+            const userWishlist = action.payload.wishlist || [];
+            const mergedWishlist = userWishlist.length > 0 ? userWishlist : state.tempWishlist;
+            
             newState = {
                 ...state,
                 isAuthenticated: true,
                 user: action.payload,
                 cart: mergedCart,
-                tempCart: [] // Clear temp cart after login
+                tempCart: [], // Clear temp cart after login
+                wishlist: mergedWishlist,
+                tempWishlist: [] // Clear temp wishlist after login
             };
             saveToLocalStorage(newState);
             return newState;
@@ -91,7 +103,9 @@ const handleAuth = (state = initialState, action) => {
                 isAuthenticated: false,
                 user: null,
                 cart: [],
-                tempCart: []
+                tempCart: [],
+                wishlist: [],
+                tempWishlist: []
             };
             saveToLocalStorage(newState);
             return newState;
@@ -189,6 +203,69 @@ const handleAuth = (state = initialState, action) => {
                 newState = {
                     ...state,
                     tempCart: []
+                };
+            }
+            saveToLocalStorage(newState);
+            return newState;
+
+        case "ADD_TO_WISHLIST":
+            if (state.isAuthenticated) {
+                const existingWishlistItem = state.wishlist.find(item => item.id === action.payload.id);
+                if (!existingWishlistItem) {
+                    newState = {
+                        ...state,
+                        wishlist: [...state.wishlist, action.payload]
+                    };
+                } else {
+                    newState = state; // Already in wishlist
+                }
+            } else {
+                const existingTempWishlistItem = state.tempWishlist.find(item => item.id === action.payload.id);
+                if (!existingTempWishlistItem) {
+                    newState = {
+                        ...state,
+                        tempWishlist: [...state.tempWishlist, action.payload]
+                    };
+                } else {
+                    newState = state; // Already in temp wishlist
+                }
+            }
+            saveToLocalStorage(newState);
+            return newState;
+
+        case "REMOVE_FROM_WISHLIST":
+            if (state.isAuthenticated) {
+                newState = {
+                    ...state,
+                    wishlist: state.wishlist.filter(item => item.id !== action.payload)
+                };
+            } else {
+                newState = {
+                    ...state,
+                    tempWishlist: state.tempWishlist.filter(item => item.id !== action.payload)
+                };
+            }
+            saveToLocalStorage(newState);
+            return newState;
+
+        case "SET_WISHLIST":
+            newState = {
+                ...state,
+                wishlist: action.payload
+            };
+            saveToLocalStorage(newState);
+            return newState;
+
+        case "CLEAR_WISHLIST":
+            if (state.isAuthenticated) {
+                newState = {
+                    ...state,
+                    wishlist: []
+                };
+            } else {
+                newState = {
+                    ...state,
+                    tempWishlist: []
                 };
             }
             saveToLocalStorage(newState);

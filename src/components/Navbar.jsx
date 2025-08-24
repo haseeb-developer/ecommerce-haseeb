@@ -13,7 +13,8 @@ import {
     FaTimes,
     FaUser,
     FaCaretDown,
-    FaSignOutAlt
+    FaSignOutAlt,
+    FaHeart
 } from 'react-icons/fa'
 import LogoutModal from './LogoutModal'
 import { logoutUser, loginUser } from '../redux/action'
@@ -25,6 +26,10 @@ const Navbar = () => {
     const totalQty = authState.isAuthenticated 
         ? authState.cart.reduce((acc, item) => acc + (item.qty || 1), 0)
         : authState.tempCart.reduce((acc, item) => acc + (item.qty || 1), 0);
+    
+    const totalWishlist = authState.isAuthenticated 
+        ? authState.wishlist.length
+        : authState.tempWishlist.length;
     
     // Debug logging
     console.log('Auth State:', authState);
@@ -276,16 +281,18 @@ const Navbar = () => {
                 .cart-button {
                     background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
                     color: white;
-                    padding: 0.7rem 1.2rem;
-                    border-radius: 12px;
+                    padding: 0.7rem;
+                    border-radius: 50%;
                     font-weight: 600;
                     text-decoration: none;
                     display: flex;
                     align-items: center;
-                    gap: 0.5rem;
+                    justify-content: center;
                     position: relative;
                     transition: all 0.3s ease;
                     box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+                    width: 44px;
+                    height: 44px;
                 }
 
                 .cart-button:hover {
@@ -297,6 +304,46 @@ const Navbar = () => {
                 .cart-count {
                     background: white;
                     color: #ff6b6b;
+                    border-radius: 50%;
+                    width: 20px;
+                    height: 20px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 0.7rem;
+                    font-weight: 700;
+                    position: absolute;
+                    top: -5px;
+                    right: -5px;
+                    animation: pulse 2s infinite;
+                }
+
+                .wishlist-button {
+                    background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+                    color: white;
+                    padding: 0.7rem;
+                    border-radius: 50%;
+                    font-weight: 600;
+                    text-decoration: none;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    position: relative;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3);
+                    width: 44px;
+                    height: 44px;
+                }
+
+                .wishlist-button:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 25px rgba(236, 72, 153, 0.4);
+                    color: white;
+                }
+
+                .wishlist-count {
+                    background: white;
+                    color: #ec4899;
                     border-radius: 50%;
                     width: 20px;
                     height: 20px;
@@ -591,9 +638,28 @@ const Navbar = () => {
                                     whileTap={{ scale: 0.95 }}
                                     className="position-relative"
                                 >
+                                    <NavLink to="/wishlist" className="wishlist-button">
+                                        <FaHeart />
+                                        {totalWishlist > 0 && (
+                                            <motion.div 
+                                                className="wishlist-count"
+                                                initial={{ scale: 0 }}
+                                                animate={{ scale: 1 }}
+                                                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                                            >
+                                                {totalWishlist}
+                                            </motion.div>
+                                        )}
+                                    </NavLink>
+                                </motion.div>
+
+                                <motion.div
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    className="position-relative"
+                                >
                                     <NavLink to="/cart" className="cart-button">
                                         <FaShoppingCart />
-                                        Cart
                                         {totalQty > 0 && (
                                             <motion.div 
                                                 className="cart-count"
@@ -674,6 +740,10 @@ const Navbar = () => {
                                             </button>
                                         </div>
                                     )}
+                                    <NavLink to="/wishlist" className="wishlist-button">
+                                        <FaHeart />
+                                        Wishlist ({totalWishlist})
+                                    </NavLink>
                                     <NavLink to="/cart" className="cart-button">
                                         <FaShoppingCart />
                                         Cart ({totalQty})
